@@ -1,0 +1,5 @@
+This folder will contain the python and dataset files
+
+- raw: will have the raw datasets first retrieved from the source
+- processed: the raw datasets after they have been cleaned and processed
+- simulations: will have datasets steming from the processed folder after required calculation have been performed on them
