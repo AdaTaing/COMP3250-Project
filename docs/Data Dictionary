@@ -1,0 +1,320 @@
+Datasets:
+
+- SPY.csv, QQQ.csv, VTI.csv
+    - the raw data for the etfs
+    - Source: Yahoo Finance
+    - Columns:
+        - Date
+            - The trading day
+            - Type: Date
+        - Open
+            - The opening price of the etf
+            - Type: Float
+        - Close
+            - The closing price of the etf
+            - Type: Float
+        - High
+            - The highest price of the etf during that day
+            - Type: Float
+        - Low
+            - The lowest price of the etf during that day
+            - Type: Float
+        - Adj Close
+            - The adjusted closing price of the etf
+            - Type: Float
+        - Volume
+            - Total number of shares sold that day
+            - Type: Integer
+
+- combined_prices.csv
+    - combined data from SPY.csv, QQQ.csv, and VTI.csv using only the Adj Close and Date columns
+    - Source: merging SPY.csv, QQQ.csv, VTI.csv
+    - Columns:
+        - Date
+            - The trading day
+            - Type: Date
+        - SPY_Price
+            - The adjusted closing price of SPY
+            - Type: Float
+        - QQQ_Price
+            - The adjusted closing price of QQQ
+            - Type: Float
+        - VTI_Price
+            - The adjusted closing price of VTI
+            - Type: Float
+
+- prices_and_indicators.csv
+    - the prices of the etfs along with their moving averages calculated
+    - Source: combine_prices.csv with added moving 50 day average column
+    - Columns:
+        - Date
+            - The trading day
+            - Type: Date
+        - SPY_Price
+            - The adjusted closing price of SPY
+            - Type: Float
+        - QQQ_Price
+            - The adjusted closing price of QQQ
+            - Type: Float
+        - VTI_Price
+            - The adjusted closing price of VTI
+            - Type: Float
+        - SPY_MA50
+            - The 50-day moving average of SPY
+            - Calculation:
+                - Take the average of SPY_Price over the past 50 days
+                - df["SPY_Price"].rolling(50).mean()
+            - Type: Float
+        - QQQ_MA50
+            - The 50-day moving average of QQQ
+            - Calculation:
+                - Take the average of QQQ_Price over the past 50 days
+                - df["QQQ_Price"].rolling(50).mean()
+            - Type: Float
+        - VTI_MA50
+            - The 50-day moving average of SPY
+            - Calculation:
+                - Take the average of VTI_Price over the past 50 days
+                - df["VTI_Price"].rolling(50).mean()
+            - Type: Float
+
+- single_buy_hold.csv, single_timing.csv, equal_buy_hold.csv, equal_timing.csv, custom_buy_hold.csv, custom_timing.csv
+    - The simulations for each portfolio case
+        - single_buy_hold.csv: Single ETF with Buy & Hold Strategy, using only SPY
+        - single_timing.csv: Single ETF with Timing Strategy, using only SPY
+        - equal_buy_hold.csv: Equal Investing Distribution with Buy & Hold Strategy, all ETFs are equally bought
+        - equal_timing.csv: Equal Investing Distribution with Timing Strategy, all ETFs are equally bought and sold
+        - custom_buy_hold.csv: Custom Investing Distribution with Buy & Hold Strategy, 50% go into SPY, 30% go into QQQ, 20% go into VTI
+        - custom_timing.csv: Custom Investing Distribution with Timing Strategy, 50% go into SPY, 30% go into QQQ, 20% go into VTI
+        - Assume Initial Investment is $10000, and biweekly contribution is $500
+
+    - Source: prices_with_indicators.csv and adding columns to help with simulations
+    - Columns:
+        Columns:
+        - Date
+            - The trading day
+            - Type: Date
+
+        - SPY_Price
+            - The adjusted closing price of SPY
+            - Type: Float
+        - QQQ_Price
+            - The adjusted closing price of QQQ
+            - Type: Float
+
+        - VTI_Price
+            - The adjusted closing price of VTI
+            - Type: Float
+
+        - SPY_MA50
+            - The 50-day moving average of SPY
+            - Calculation: already calculated from prices_with_indicators.csv
+            - Type: Float
+
+        - QQQ_MA50
+            - The 50-day moving average of QQQ
+            - Calculation: already calculated from prices_with_indicators.csv
+            - Type: Float
+
+        - VTI_MA50
+            - The 50-day moving average of SPY
+            - Calculation: already calculated from prices_with_indicators.csv
+            - Type: Float
+
+        - Position_SPY
+            - indicates when to buy or sell shares, 1 being buy and 0 being sell
+            - Calculation:
+                - in all Buy & Hold simulutions, Position_SPY is always 1
+                - in all Timing simulations
+                    - 1 if SPY_Price > SPY_MA50
+                    - else it is 0
+
+                - if price > ma:
+                    position = 1
+                  else:
+                    position = 0
+
+            - Type: Integer/Boolean
+
+        - Position_QQQ
+            - indicates when to buy or sell shares, 1 being buy and 0 being sell
+            - Calculation:
+                - in all Buy & Hold simulutions, Position_QQQ is always 1
+                - in all Timing simulations
+                    - 1 if QQQ_Price > QQQ_MA50
+                    - else it is 0
+
+                - if price > ma:
+                    position = 1
+                  else:
+                    position = 0
+
+            - Type: Integer/Boolean
+
+        - Position_VTI
+            - indicates when to buy or sell shares, 1 being buy and 0 being sell
+            - Calculation:
+                - in all Buy & Hold simulutions, Position_VTI is always 1
+                - in all Timing simulations
+                    - 1 if VTI_Price > VTI_MA50
+                    - else it is 0
+
+                - if price > ma:
+                    position = 1
+                  else:
+                    position = 0
+
+            - Type: Integer/Boolean
+
+        - Contribution
+            - the amount contributed that day, contributions happen biweekly (or every 10 days)
+            - Calculation:
+                - Every 10 days, add the contribution amount (which is $500)
+                - if i % 10 == 0:
+                    contribution = 500
+
+            - Type: Float
+
+        - Cash
+            - the available cash that can be used to buy shares (from biweekly contributions and profits from selling shares)
+            - Calculation:
+                - On the first row/initial investment
+                    - Cash would be set to the Initial Investment amount ($10000)
+                    - Cash will be used to buy the initial shares, so Cash will be back to 0
+                    - Cash = 0 (After first shares calculations)
+
+                - When contributions happen (when contribution is not 0)
+                    - Add contribution amount to cash
+                    - Cash + Contribution
+
+                - When buying shares (When position is 1)
+                    - take away from cash depending on the ETF's portfolio distribution amount
+                    - Cash - Amount Invested
+                        - Amount Invested = Cash * ETF Distribution
+                        - Example:
+                            - SPY in Custom Portfolio (SPY is 50%)
+                            - Cash - (Cash * 0.5)
+
+                    - amount = cash * weight
+                      shares[etf] += amount / price
+                      cash -= amount
+
+                - When selling shares (when position is 0)
+                    - add to cash depending on the number of shares the ETF has and the current price
+                    - Cash + (Number of shares * ETF Price)
+
+                    - cash += shares[etf] * price
+                      shares[etf] = 0
+
+                - *the Cash columns final amount is calculated after share calculations
+
+            - Type: Float
+
+        - Shares_SPY
+            - shows how many shares of SPY the portfolio has during that day
+            - Calculation:
+                - For the initial investment or first date on the table
+                    - Initial Investment / SPY_Price
+                - For when Position_SPY is 1
+                    - Use cash, the distribution amount for SPY, and SPY_Price to calculate amount
+                    - (Cash * SPY Distribution Percent) / SPY_Price
+
+                    - amount = cash * weight
+                      shares[etf] += amount / price
+
+                - For when Position_SPY is 0
+                    - Add to cash using the distribution amount for SPY and SPY_Price to calculate amount
+                    - Shares set to 0
+
+            - Type: Float
+        
+        - Shares_QQQ
+            - shows how many shares of QQQ the portfolio has during that day
+            - Calculation:
+                - In the single ETF portfolio, shares will always be 0
+                - For the initial investment or first date on the table
+                    - Initial Investment / QQQ_Price
+
+                - For when Position_QQQ is 1
+                    - Use cash, the distribution amount for QQQ, and QQQ_Price to calculate amount
+                    - (Cash * QQQ Distribution Percent) / QQQ_Price
+
+                    - amount = cash * weight
+                      shares[etf] += amount / price
+
+                - For when Position_QQQ is 0
+                    - Add to cash using the distribution amount for QQQ and QQQ_Price to calculate amount
+                    - Shares set to 0
+
+            - Type: Float
+
+        - Shares_VTI
+            - shows how many shares of VTI the portfolio has during that day
+            - Calculation:
+                - In the single ETF portfolio, shares will always be 0
+                - For the initial investment or first date on the table
+                    - Initial Investment / VTI_Price
+
+                - For when Position_VTI is 1
+                    - Use cash, the distribution amount for VTI, and VTI_Price to calculate amount
+                    - (Cash * VTI Distribution Percent) / VTI_Price
+
+                    - amount = cash * weight
+                      shares[etf] += amount / price
+
+                - For when Position_VTI is 0
+                    - Add to cash using the distribution amount for VTI and VTI_Price to calculate amount
+                    - Shares set to 0
+
+            - Type: Float
+
+        - Total_Invested
+            - the amount invested to date
+            - Calculation:
+                - The Initial Invesetment ($10000) plus the sum of all contributions to date
+                - Initial Investment + sum(all contributions)
+                
+                - total_invested = 10000 (the first date)
+                  total_invested += contribution (after the first date)
+            
+            - Type: Float
+
+        - Porfolio_Value
+            - The total value of the portfolio
+            - Calculation:
+                - The ETF prices * the number of shares for each, and cash
+                - value = (
+                    shares_spy * spy_price +
+                    shares_qqq * qqq_price +
+                    shares_vti * vti_price +
+                    cash
+                  )
+            - Type: Float
+
+        - Earnings
+            - profits loss or gained based on total invested
+            - Calculation:
+                - Portfolio_Value − Total_Invested
+                - df["Earnings"] = df["Portfolio_Value"] - df["Total_Invested"]
+            - Type: Float
+
+        - Daily_Return
+            - the percentage change in portfolio value compared to the day before
+            - Calculation:
+                - (Value_today − Value_yesterday) / Value_yesterday
+                - df["Daily_Return"] = df["Portfolio_Value"].pct_change()
+            - Type: Percent
+
+        - Strategy
+            - the strategy used in the simulation
+            - Calculation:
+                - Either "Buy & Hold" or "Timing"
+            - Type: String
+        
+        - Portfolio_Type
+            - the portfolio case used in the simulation
+            - Calculation:
+                - "Single": 100% SPY
+                - "Equal": 33.3% in SPY, QQQ, and VTI
+                - "Custom": 50% in SPY, 30% in QQQ, and 20% in VTI
+            - Type: String
