@@ -89,6 +89,7 @@ Datasets:
         - Assume Initial Investment is $10000, and biweekly contribution is $500
 
     - Source: prices_with_indicators.csv and adding columns to help with simulations
+    
     - Columns:
         Columns:
         - Date
