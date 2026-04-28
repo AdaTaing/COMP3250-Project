@@ -211,13 +211,22 @@ Each simulation is evaluated on five metrics:
 
 ---
 
-## Key Findings
+## 📈Key Findings📈
 
 - **Buy & Hold** produced the highest total profit, final portfolio value, and CAGR across all portfolio types — it is the stronger strategy for maximizing long-term returns.
 - **Market Timing** produced lower volatility, a smaller maximum drawdown, and a more efficient Sharpe Ratio — it is the safer strategy for investors primarily concerned with limiting large losses.
 - The best overall portfolio value, best total profit, and best CAGR all belonged to **Buy & Hold – Equal**.
 - The lowest max drawdown and lowest volatility belonged to **Timing – Single**.
 - **Conclusion:** Buy & Hold is better for growing wealth over time. Market Timing is better for investors who prioritize capital preservation and cannot tolerate large swings.
+
+| Portfolio_Type | Strategy | Final_Portfolio_Value | Total_Profit | 
+|---|---|---|---|
+| Custom | Buy & Hold | 2210672.43 | 1890172.43 | 
+| Custom | Timing | 1141998.94 | 821498.94 | 
+| Equal | Buy & Hold | 2262663.55 | 1942163.55 | 
+| Equal | Timing | 1150538.82 | 830038.82 | 
+| Single | Buy & Hold | 1729330.94 | 1408830.94 | 
+| Single | Timing | 725083.84 | 404583.84 | 
 
 ---
 
